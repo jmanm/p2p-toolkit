@@ -1,0 +1,18 @@
+{
+  "name": "p2p-toolkit",
+  "module": "index.ts",
+  "type": "module",
+  "scripts": {
+    "rpc:generate": "proto-loader-gen-types --longs=String --enums=String --defaults --oneofs --grpcLib=@grpc/grpc-js --outDir=./ ../p2panda/aquadoggo/aquadoggo/proto/rpc.proto"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.10.6",
+    "@grpc/proto-loader": "^0.7.12"
+  }
+}
