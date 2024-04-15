@@ -44,7 +44,7 @@ export class AquadoggoClient {
   }
 
   async getDocument({ documentId, documentViewId }: DocumentRequest) {
-    if ((!documentId || documentId.length < HASH_LEN) ||
+    if ((!documentId || documentId.length < HASH_LEN) &&
         (!documentViewId || documentViewId.length < HASH_LEN)
     ) {
       throw new Error('Missing or malformed document ID and/or document view ID');
