@@ -1,0 +1,16 @@
+{
+  "name": "p2p-toolkit",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@faker-js/faker": "^8.4.1",
+    "graphql-request": "^6.1.0",
+    "tiny-invariant": "^1.3.3"
+  }
+}

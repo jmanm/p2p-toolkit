@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "workspaces": ["packages/*"],
   "scripts": {
-    "demo": "bun run packages/toolkit/index.ts"
+    "demo": "bun packages/toolkit/index.ts",
+    "bench:create": "bun packages/examples/index.ts create"
   }
 }
