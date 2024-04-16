@@ -1,8 +1,8 @@
-import { Customer, User } from "./models";
+import { Organization, User } from "./models";
 import { faker } from '@faker-js/faker';
-import { createCustomer as gqlCreateCustomer } from "./graphql/customer";
+import { createOrganization as gqlCreateOrganization } from "./graphql/organization";
 import { createUser as gqlCreateUser } from "./graphql/user";
-import { createCustomer as rpcCreateCustomer } from "./grpc/customer";
+import { createOrganization as rpcCreateOrganization } from "./grpc/organization";
 import { createUser as rpcCreateUser } from "./grpc/user";
 import { KeyPair } from 'p2panda-js';
 import { argv } from "bun";
@@ -12,10 +12,10 @@ import { cleanup, init } from "./grpc/request";
 
 enum ReqType { 'graphql', 'grpc' };
 
-function createCustomer(owner: KeyPair, reqType: ReqType) {
+function createOrganization(owner: KeyPair, reqType: ReqType) {
   const name = faker.company.name();
   const url = `${name.replaceAll(' ', '')}.com`;
-  const data: Customer = {
+  const data: Organization = {
     name,
     email: `info@${url}`,
     phone: faker.phone.number(),
@@ -23,8 +23,8 @@ function createCustomer(owner: KeyPair, reqType: ReqType) {
     taxId: faker.string.numeric(10)
   };
   return reqType === ReqType.graphql ?
-    gqlCreateCustomer(data, owner) :
-    rpcCreateCustomer(data, owner);
+    gqlCreateOrganization(data, owner) :
+    rpcCreateOrganization(data, owner);
 }
 
 function createUser(memberOf: string, reqType: ReqType) {
@@ -45,14 +45,14 @@ function createUser(memberOf: string, reqType: ReqType) {
 
 async function createUserList(count: number, reqType: ReqType) {
   const keyPair = await getKeyPair() ?? await createKeyPair();
-  const customer = await createCustomer(keyPair, reqType);
-  invariant(customer, 'No customer created');
+  const organization = await createOrganization(keyPair, reqType);
+  invariant(organization, 'No organization created');
   for (let i = 0; i < count; i++) {
-    await createUser(customer?.meta.documentId, reqType);
+    await createUser(organization?.meta.documentId, reqType);
   }
 }
 
-async function main() {
+async function runBenchmark() {
   const command = argv[2];
   const reqType = argv[3];
   invariant(reqType in ReqType, `${reqType} is an invalid request type`);
@@ -76,7 +76,7 @@ async function main() {
   }
 }
 
-await main();
+await runBenchmark();
 
 /*
   Benchmark 1: bun bench:create graphql 1000

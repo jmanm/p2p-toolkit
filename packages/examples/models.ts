@@ -28,7 +28,7 @@ export type Contact = {
   phone: string;
 }
 
-export type Customer = Contact & {
+export type Organization = Contact & {
   taxId: string;
   url: string;
 }
@@ -44,7 +44,7 @@ export type UserResponse = {
   fields: User;
 }
 
-export type CustomerResponse = {
+export type OrganizationResponse = {
   meta: Meta;
-  fields: Overwrite<Customer, { users?: UserResponse[] }>;
+  fields: Overwrite<Organization, { users?: UserResponse[] }>;
 }
