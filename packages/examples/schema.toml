@@ -1,0 +1,20 @@
+[organization]
+description = "Company, club, non-profit, etc."
+
+[organization.fields]
+name = { type = "str" }
+email = { type = "str" }
+taxId = { type = "str" }
+url = { type = "str" }
+phone = { type = "str" }
+
+[user]
+description = "Individual user"
+
+[user.fields]
+name = { type = "str" }
+email = { type = "str" }
+phone = { type = "str" }
+pubKey = { type = "str" }
+nostrPubKey = { type = "str" }
+memberOf = { type = "relation", schema = { name = "organization" } }
