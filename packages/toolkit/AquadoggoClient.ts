@@ -6,6 +6,8 @@ import type { DocumentRequest } from "./rpc/DocumentRequest";
 import type { CollectionRequest } from "./rpc/CollectionRequest";
 import { KeyPair, OperationFields, encodeOperation, signAndEncodeEntry, type EasyValues, type EntryArgs, type OperationArgs } from "p2panda-js";
 import type { NextArgsResponse } from "./rpc/NextArgsResponse";
+import type { CollectionResponse } from "./rpc/CollectionResponse";
+import type { DocumentResponse } from "./rpc/DocumentResponse";
 
 const HASH_LEN = 68;
 
@@ -55,7 +57,7 @@ export class AquadoggoClient {
     })
   }
 
-  async getCollection({ schemaId, pagination, order, filter }: CollectionRequest) {
+  async getCollection({ schemaId, pagination, order, filter }: CollectionRequest): Promise<CollectionResponse> {
     if (!schemaId || schemaId.length < HASH_LEN) {
       throw new Error('Missing or malformed schema ID');
     }
@@ -70,7 +72,7 @@ export class AquadoggoClient {
     });
   }
 
-  async getDocument({ documentId, documentViewId }: DocumentRequest) {
+  async getDocument({ documentId, documentViewId }: DocumentRequest): Promise<DocumentResponse> {
     if ((!documentId || documentId.length < HASH_LEN) &&
         (!documentViewId || documentViewId.length < HASH_LEN)
     ) {

@@ -1,9 +1,10 @@
 import invariant from "tiny-invariant";
 import { createKeyPair } from "../key-pair";
-import { User } from "../models";
+import { SearchResponse, User } from "../models";
 import { OperationFields } from "p2panda-js";
 import { USER_SCHEMA_ID } from "../constants";
-import { createItem } from "./request";
+import { createItem, getCollection, getDocument } from "./request";
+import { Document } from "p2p-toolkit";
 
 export async function createUser(value: Omit<User, 'pubKey'>) {
   const keyPair = await createKeyPair();
@@ -30,4 +31,24 @@ export async function createUser(value: Omit<User, 'pubKey'>) {
   console.log('Created user!', backlink);
 
   return user;
+}
+
+export async function getUserByDocumentId(documentId: string) {
+  const doc = await getDocument({ documentId });
+  return buildObject(doc.document ?? {});
+}
+
+const buildObject = (document: Document) => ({
+  meta: document.meta,
+  fields: Object.fromEntries((document.fields ?? []).map(f => [
+    f.name,
+    f.relVal ? buildObject(f.relVal) : f.stringVal
+  ]))
+});
+
+export async function getUsers(first: number): Promise<SearchResponse<User>> {
+  const result = await getCollection({ schemaId: USER_SCHEMA_ID, pagination: { first } });
+  invariant(result.documents);
+  const documents = result.documents.map(d => buildObject(d.document ?? {}));
+  return { documents };
 }

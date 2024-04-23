@@ -77,3 +77,74 @@ export async function getUserByPublicKey(pubKey: string) {
     return results[0];
   }
 }
+
+export async function getUserByDocumentId(documentId: string) {
+  const query = gql`query GetUser($documentId: String!) {
+    user: user_0020d46bc90998a634c344687ca95dcd01366d2f9440afa8485a068898551a6ef9c7(
+      id: $documentId
+    ) {
+      meta {
+        documentId
+        viewId
+      }
+      fields {
+        nostrPubKey
+        name
+        email
+        phone
+        pubKey
+        memberOf {
+          meta {
+            documentId
+            viewId
+          }
+          fields {
+            email
+            name
+            phone
+            taxId
+            url
+          }
+        }
+      }
+    }`;
+    const result = await request<{ user: User }>(query, { documentId });
+    return result?.user;
+}
+
+export async function getUsers(first: number): Promise<SearchResponse<User>> {
+  const query = gql`query GetUserIds($first: Int!) {
+    users: all_user_0020d46bc90998a634c344687ca95dcd01366d2f9440afa8485a068898551a6ef9c7(
+      first: $first
+    ) {
+      documents {
+        meta {
+          documentId
+          viewId
+        }
+        fields {
+          nostrPubKey
+          name
+          email
+          phone
+          pubKey
+          memberOf {
+            meta {
+              documentId
+              viewId
+            }
+            fields {
+              email
+              name
+              phone
+              taxId
+              url
+            }
+          }
+        }
+      }
+    }
+  }`;
+  const result = await request<SearchResponse<User>>(query, { first });
+  return (result?.users ?? []) as SearchResponse<User>;
+}

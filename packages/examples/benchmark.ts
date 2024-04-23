@@ -1,9 +1,9 @@
 import { Organization, User } from "./models";
 import { faker } from '@faker-js/faker';
 import { createOrganization as gqlCreateOrganization } from "./graphql/organization";
-import { createUser as gqlCreateUser } from "./graphql/user";
+import { getUsers, createUser as gqlCreateUser, getUserByDocumentId as gqlGetUser, getUsers as gqlGetusers } from "./graphql/user";
 import { createOrganization as rpcCreateOrganization } from "./grpc/organization";
-import { createUser as rpcCreateUser } from "./grpc/user";
+import { createUser as rpcCreateUser, getUserByDocumentId as rpcGetUser, getUsers as rpcGetUsers } from "./grpc/user";
 import { KeyPair } from 'p2panda-js';
 import { argv } from "bun";
 import { createKeyPair, getKeyPair } from "./key-pair";
@@ -49,7 +49,28 @@ async function createUserList(count: number, reqType: ReqType) {
   invariant(organization, 'No organization created');
   for (let i = 0; i < count; i++) {
     await createUser(organization?.meta.documentId, reqType);
+    console.debug('After create:', Bun.nanoseconds()/1000000);
   }
+}
+
+const getUser = (docId: string, reqType: ReqType) =>
+  reqType === ReqType.graphql ?
+    gqlGetUser(docId) :
+    rpcGetUser(docId);
+
+async function getNUsers(limit: number, reqType: ReqType) {
+  const result = reqType === ReqType.graphql ?
+    await gqlGetusers(limit) :
+    await rpcGetUsers(limit);
+
+  const users: User[] = [];
+  for (const doc of result.documents) {
+    const user = await getUser(doc.meta.documentId, reqType);
+    console.debug(user, Bun.nanoseconds()/1000000);
+    users.push(user as User);
+  }
+
+  return users;
 }
 
 async function runBenchmark() {
@@ -60,14 +81,26 @@ async function runBenchmark() {
 
   if (reqType === 'grpc') {
     await init();
+    console.debug('After init:', Bun.nanoseconds()/1000000);
   }
 
   switch (command) {
     case 'create': {
       const count = Number(arg);
       invariant(count, 'invalid count');
-      console.log('Creating', count, 'users using', reqType);
+      console.debug('Creating', count, 'users using', reqType);
       await createUserList(count, ReqType[reqType]);
+      console.debug('After run:', Bun.nanoseconds()/1000000);
+    }
+    case 'get-one': {
+      const limit = Number(arg);
+      invariant(limit, 'invalid limit');
+      await getNUsers(limit, ReqType[reqType]);
+    }
+    case 'get-many': {
+      const limit = Number(arg);
+      invariant(limit, 'invalid limit');
+      await getUsers(limit);
     }
   }
 

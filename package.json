@@ -4,6 +4,10 @@
   "workspaces": ["packages/*"],
   "scripts": {
     "demo": "bun packages/toolkit/demo.ts",
-    "bench:create": "bun packages/examples/benchmark.ts create"
+    "bench:schema:deploy": "fishy deploy -l packages/examples/schema.lock",
+    "bench:schema:out": "fishy build -i -j -s packages/examples/schema.toml -l packages/examples/schema.lock -k private-key.txt > packages/examples/schemas.json",
+    "bench:create": "bun packages/examples/benchmark.ts create",
+    "bench:get-one": "bun packages/examples/benchmark.ts get-one",
+    "bench:get-many": "bun packages/examples/benchmark.ts get-many"
   }
 }
