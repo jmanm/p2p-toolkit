@@ -8,7 +8,7 @@ async function main() {
       serverUrl: 'localhost:2021' // omit 'http'
     });
 
-    const doc = await client.getDocument({ documentId: '0020a5c1c397b6f515f5df7f80c4d821fd0a70f098b9b3c3c1a06934ad638eea87aa' });
+    const doc = await client.getDocument({ documentId: '002000185bb22277e1acf0f1d944d9e713fb3a98b90e85a6e9e3fdefa6db710242bb' });
     console.log('DOC', doc);
     client.dispose();
   }

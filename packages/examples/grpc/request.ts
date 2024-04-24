@@ -1,5 +1,6 @@
-import { AquadoggoClient, ChannelCredentials, CollectionRequest, CollectionResponse, DocumentRequest } from 'p2p-toolkit';
+import { AquadoggoClient, ChannelCredentials, CollectionRequest, DocumentRequest } from 'p2p-toolkit';
 import { EasyValues, KeyPair, OperationFields } from 'p2panda-js';
+import { AQUADOGGO_RPC_ENDPOINT } from '../constants';
 
 let client: AquadoggoClient;
 
@@ -7,7 +8,7 @@ export async function init() {
   client = await AquadoggoClient.load({
     credentials: ChannelCredentials.createInsecure(),
     protoFilePath: '../p2panda/aquadoggo/aquadoggo/proto/rpc.proto',
-    serverUrl: 'localhost:2021' // omit 'http'
+    serverUrl: AQUADOGGO_RPC_ENDPOINT
   });
 }
 
