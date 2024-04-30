@@ -1,4 +1,4 @@
-import { AquadoggoClient, ChannelCredentials, CollectionRequest, DocumentRequest } from 'p2p-toolkit';
+import { AquadoggoClient, ChannelCredentials, CollectionRequest, DocumentRequest } from '@p2p-toolkit/toolkit';
 import { EasyValues, KeyPair, OperationFields } from 'p2panda-js';
 import { AQUADOGGO_RPC_ENDPOINT } from '../constants';
 

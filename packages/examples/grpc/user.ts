@@ -4,7 +4,7 @@ import { SearchResponse, User } from "../models";
 import { OperationFields } from "p2panda-js";
 import { USER_SCHEMA_ID } from "../constants";
 import { createItem, getCollection, getDocument } from "./request";
-import { Document } from "p2p-toolkit";
+import { Document } from "@p2p-toolkit/toolkit";
 
 export async function createUser(value: Omit<User, 'pubKey'>) {
   const keyPair = await createKeyPair();
