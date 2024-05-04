@@ -49,7 +49,6 @@ async function createUserList(count: number, reqType: ReqType) {
   invariant(organization, 'No organization created');
   for (let i = 0; i < count; i++) {
     await createUser(organization?.meta.documentId, reqType);
-    console.debug('After create:', Bun.nanoseconds()/1000000);
   }
 }
 
@@ -66,7 +65,6 @@ async function getNUsers(limit: number, reqType: ReqType) {
   const users: User[] = [];
   for (const doc of result.documents) {
     const user = await getUser(doc.meta.documentId, reqType);
-    console.debug(user, Bun.nanoseconds()/1000000);
     users.push(user as User);
   }
 
@@ -81,16 +79,13 @@ async function runBenchmark() {
 
   if (reqType === 'grpc') {
     await init();
-    console.debug('After init:', Bun.nanoseconds()/1000000);
   }
 
   switch (command) {
     case 'create': {
       const count = Number(arg);
       invariant(count, 'invalid count');
-      console.debug('Creating', count, 'users using', reqType);
       await createUserList(count, ReqType[reqType]);
-      console.debug('After run:', Bun.nanoseconds()/1000000);
     }
     case 'get-one': {
       const limit = Number(arg);
@@ -112,15 +107,7 @@ async function runBenchmark() {
 await runBenchmark();
 
 /*
-  Benchmark 1: bun bench:create graphql 1000
-  Time (mean ± σ):      3.677 s ±  0.646 s    [User: 0.949 s, System: 0.312 s]
-  Range (min … max):    2.584 s …  4.515 s    10 runs
-
-  Benchmark 1: bun bench:create grpc 1000
-  Time (mean ± σ):      5.496 s ±  0.393 s    [User: 1.338 s, System: 0.469 s]
-  Range (min … max):    4.948 s …  6.084 s    10 runs
-
-  Benchmark 1: bun bench:create graphql 1000
-  Time (mean ± σ):      7.188 s ±  0.447 s    [User: 1.220 s, System: 0.520 s]
-  Range (min … max):    6.544 s …  7.816 s    10 runs
+  Benchmark 1: bun run bench:create grpc 10
+  Time (mean ± σ):     288.0 ms ±  14.6 ms    [User: 350.1 ms, System: 54.5 ms]
+  Range (min … max):   276.5 ms … 325.3 ms    10 runs
 */

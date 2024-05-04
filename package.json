@@ -4,6 +4,7 @@
   "workspaces": ["packages/*"],
   "scripts": {
     "demo": "bun packages/toolkit/demo.ts",
+    "bench:init": "bun run bench:schema:deploy && bun run bench:schema:out",
     "bench:schema:deploy": "fishy deploy -l packages/examples/schema.lock",
     "bench:schema:out": "fishy build -i -j -s packages/examples/schema.toml -l packages/examples/schema.lock -k private-key.txt > packages/examples/schemas.json",
     "bench:create": "bun packages/examples/benchmark.ts create",
