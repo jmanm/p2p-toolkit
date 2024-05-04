@@ -5,7 +5,6 @@ import { getUsers, createUser as gqlCreateUser, getUserByDocumentId as gqlGetUse
 import { createOrganization as rpcCreateOrganization } from "./grpc/organization";
 import { createUser as rpcCreateUser, getUserByDocumentId as rpcGetUser, getUsers as rpcGetUsers } from "./grpc/user";
 import { KeyPair } from 'p2panda-js';
-import { argv } from "bun";
 import { createKeyPair, getKeyPair } from "./key-pair";
 import invariant from "tiny-invariant";
 import { cleanup, init } from "./grpc/request";
@@ -14,7 +13,7 @@ enum ReqType { 'graphql', 'grpc' };
 
 function createOrganization(owner: KeyPair, reqType: ReqType) {
   const name = faker.company.name();
-  const url = `${name.replaceAll(' ', '')}.com`;
+  const url = `${name.replace(' ', '')}.com`;
   const data: Organization = {
     name,
     email: `info@${url}`,
@@ -72,6 +71,7 @@ async function getNUsers(limit: number, reqType: ReqType) {
 }
 
 async function runBenchmark() {
+  const { argv } = process;
   const command = argv[2];
   const reqType = argv[3];
   invariant(reqType in ReqType, `${reqType} is an invalid request type`);
