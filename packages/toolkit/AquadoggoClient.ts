@@ -1,13 +1,13 @@
 import { loadPackageDefinition, ChannelCredentials } from "@grpc/grpc-js";
 import { load as loadProto } from '@grpc/proto-loader';
-import type { ProtoGrpcType } from "./rpc";
-import type { ConnectClient } from "./rpc/Connect";
-import type { DocumentRequest } from "./rpc/DocumentRequest";
-import type { CollectionRequest } from "./rpc/CollectionRequest";
+import type { ProtoGrpcType } from "./rpc.js";
+import type { ConnectClient } from "./rpc/Connect.js";
+import type { DocumentRequest } from "./rpc/DocumentRequest.js";
+import type { CollectionRequest } from "./rpc/CollectionRequest.js";
 import { KeyPair, OperationFields, encodeOperation, signAndEncodeEntry, type EasyValues, type EntryArgs, type OperationArgs } from "p2panda-js";
-import type { NextArgsResponse } from "./rpc/NextArgsResponse";
-import type { CollectionResponse } from "./rpc/CollectionResponse";
-import type { DocumentResponse } from "./rpc/DocumentResponse";
+import type { NextArgsResponse } from "./rpc/NextArgsResponse.js";
+import type { CollectionResponse } from "./rpc/CollectionResponse.js";
+import type { DocumentResponse } from "./rpc/DocumentResponse.js";
 
 const HASH_LEN = 68;
 

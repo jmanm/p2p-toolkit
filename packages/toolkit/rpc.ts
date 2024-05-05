@@ -1,7 +1,7 @@
 import type * as grpc from '@grpc/grpc-js';
 import type { EnumTypeDefinition, MessageTypeDefinition } from '@grpc/proto-loader';
 
-import type { ConnectClient as _rpc_ConnectClient, ConnectDefinition as _rpc_ConnectDefinition } from './rpc/Connect';
+import type { ConnectClient as _rpc_ConnectClient, ConnectDefinition as _rpc_ConnectDefinition } from './rpc/Connect.js';
 
 type SubtypeConstructor<Constructor extends new (...args: any) => any, Subtype> = {
   new(...args: ConstructorParameters<Constructor>): Subtype;

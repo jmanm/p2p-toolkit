@@ -1,5 +1,5 @@
 import { ChannelCredentials } from "@grpc/grpc-js";
-import { AquadoggoClient } from "./AquadoggoClient";
+import { AquadoggoClient } from "./AquadoggoClient.js";
 
 async function main() {
     const client = await AquadoggoClient.load({

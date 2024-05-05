@@ -1,7 +1,7 @@
 {
   "name": "@p2p-toolkit/toolkit",
   "version": "1.0.0",
-  "module": "index.ts",
+  "module": "index.js",
   "type": "module",
   "scripts": {
     "rpc:generate": "proto-loader-gen-types --longs=String --enums=String --defaults --oneofs --grpcLib=@grpc/grpc-js --outDir=./ ../p2panda/aquadoggo/aquadoggo/proto/rpc.proto"

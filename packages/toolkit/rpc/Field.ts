@@ -1,8 +1,7 @@
 // Original file: ../p2panda/aquadoggo/aquadoggo/proto/rpc.proto
 
-import type { Document as _rpc_Document, Document__Output as _rpc_Document__Output } from '../rpc/Document';
-import type { DocumentList as _rpc_DocumentList, DocumentList__Output as _rpc_DocumentList__Output } from '../rpc/DocumentList';
-import type { Long } from '@grpc/proto-loader';
+import type { Document as _rpc_Document, Document__Output as _rpc_Document__Output } from '../rpc/Document.js';
+import type { DocumentList as _rpc_DocumentList, DocumentList__Output as _rpc_DocumentList__Output } from '../rpc/DocumentList.js';
 
 export interface Field {
   'name'?: (string);
@@ -11,7 +10,7 @@ export interface Field {
   'pinnedRelVal'?: (_rpc_Document | null);
   'pinnedRelListVal'?: (_rpc_DocumentList | null);
   'stringVal'?: (string);
-  'intVal'?: (number | string | Long);
+  'intVal'?: (number | string | bigint);
   'floatVal'?: (number | string);
   'boolVal'?: (boolean);
   'byteVal'?: (Buffer | Uint8Array | string);

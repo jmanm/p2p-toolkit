@@ -1,10 +1,8 @@
 // Original file: ../p2panda/aquadoggo/aquadoggo/proto/rpc.proto
 
-import type { Long } from '@grpc/proto-loader';
-
 export interface NextArgsResponse {
-  'logId'?: (number | string | Long);
-  'seqNum'?: (number | string | Long);
+  'logId'?: (number | string | bigint);
+  'seqNum'?: (number | string | bigint);
   'backlink'?: (string);
   'skiplink'?: (string);
   '_backlink'?: "backlink";
