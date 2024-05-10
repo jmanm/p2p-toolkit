@@ -66,13 +66,10 @@ export async function createItem(keyPair: KeyPair, model: EasyValues | Operation
     fields: model,
   });
 
-  const entry = signAndEncodeEntry(
-    {
-      ..._nextArgs,
-      operation,
-    },
-    keyPair,
-  );
+  const entry = signAndEncodeEntry({
+    ..._nextArgs,
+    operation,
+  }, keyPair);
 
   return await publish(entry, operation);
 }

@@ -4,7 +4,7 @@ import type { ProtoGrpcType } from "./rpc";
 import type { ConnectClient } from "./rpc/Connect";
 import type { DocumentRequest } from "./rpc/DocumentRequest";
 import type { CollectionRequest } from "./rpc/CollectionRequest";
-import { KeyPair, OperationFields, encodeOperation, signAndEncodeEntry, type EasyValues, type EntryArgs, type OperationArgs } from "p2panda-js";
+import { KeyPair, OperationFields, encodeOperation, signAndEncodeEntry, type EasyValues } from "p2panda-js";
 import type { NextArgsResponse } from "./rpc/NextArgsResponse";
 import type { CollectionResponse } from "./rpc/CollectionResponse";
 import type { DocumentResponse } from "./rpc/DocumentResponse";
