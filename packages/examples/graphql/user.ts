@@ -2,7 +2,7 @@ import { createKeyPair, getKeyPair } from "../key-pair";
 import { createItem, request } from "./request";
 import { USER_SCHEMA_ID } from "../constants";
 import { OperationFields } from "p2panda-js";
-import { SearchResponse, User } from "../models";
+import { SearchResponse, User, UserResponse } from "../models";
 import { StringOp } from "../common";
 import { gql } from "graphql-request";
 import invariant from "tiny-invariant";
@@ -49,14 +49,13 @@ export async function findUsers(filter: UserFilter) {
           fields {
             name
             email
-            phone
           }
         }
       }
     }`;
 
   const result = await request<SearchResponse<Partial<User>>>(query, { filter });
-  return result?.user?.documents;
+  return result?.documents;
 }
 
 export async function currentUser() {
@@ -78,7 +77,7 @@ export async function getUserByPublicKey(pubKey: string) {
   }
 }
 
-export async function getUserByDocumentId(documentId: string) {
+export async function getUserByDocumentId(documentId: string): Promise<UserResponse | undefined> {
   const query = gql`query GetUser($documentId: String!) {
     user: user_0020d46bc90998a634c344687ca95dcd01366d2f9440afa8485a068898551a6ef9c7(
       id: $documentId
@@ -86,33 +85,19 @@ export async function getUserByDocumentId(documentId: string) {
       meta {
         documentId
         viewId
+        owner
       }
       fields {
-        nostrPubKey
         name
         email
-        phone
-        pubKey
-        memberOf {
-          meta {
-            documentId
-            viewId
-          }
-          fields {
-            email
-            name
-            phone
-            taxId
-            url
-          }
-        }
       }
-    }`;
-    const result = await request<{ user: User }>(query, { documentId });
-    return result?.user;
+    }
+  }`;
+  const result = await request<{ user: UserResponse }>(query, { documentId });
+  return result?.user;
 }
 
-export async function getUsers(first: number): Promise<SearchResponse<User>> {
+export async function getUsers(first: number): Promise<SearchResponse<UserResponse>> {
   const query = gql`query GetUserIds($first: Int!) {
     users: all_user_0020d46bc90998a634c344687ca95dcd01366d2f9440afa8485a068898551a6ef9c7(
       first: $first
@@ -121,30 +106,15 @@ export async function getUsers(first: number): Promise<SearchResponse<User>> {
         meta {
           documentId
           viewId
+          owner
         }
         fields {
-          nostrPubKey
           name
           email
-          phone
-          pubKey
-          memberOf {
-            meta {
-              documentId
-              viewId
-            }
-            fields {
-              email
-              name
-              phone
-              taxId
-              url
-            }
-          }
         }
       }
     }
   }`;
-  const result = await request<SearchResponse<User>>(query, { first });
-  return (result?.users ?? []) as SearchResponse<User>;
+  const result = await request<{ users: SearchResponse<UserResponse> }>(query, { first });
+  return (result?.users ?? {}) as SearchResponse<UserResponse>;
 }

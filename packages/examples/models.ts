@@ -41,7 +41,7 @@ export type User = Contact & {
 
 export type UserResponse = {
   meta: Meta;
-  fields: User;
+  fields: Partial<User>;
 }
 
 export type OrganizationResponse = {

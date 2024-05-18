@@ -27,7 +27,7 @@ function createOrganization(owner: KeyPair, reqType: ReqType) {
     rpcCreateOrganization(data, owner);
 }
 
-function createUser(memberOf: string, reqType: ReqType) {
+async function createUser(memberOf: string, reqType: ReqType) {
   const firstName = faker.person.firstName();
   const lastName = faker.person.lastName();
   const data: User = {
@@ -38,9 +38,12 @@ function createUser(memberOf: string, reqType: ReqType) {
     phone: faker.phone.number(),
     pubKey: ''
   };
-  return reqType === ReqType.graphql ?
-    gqlCreateUser(data) :
-    rpcCreateUser(data);
+  const user = reqType === ReqType.graphql ?
+    await gqlCreateUser(data) :
+    await rpcCreateUser(data);
+
+  console.log('Created user!', user.meta.documentId);
+  return user;
 }
 
 async function createUserList(count: number, reqType: ReqType) {
@@ -52,10 +55,13 @@ async function createUserList(count: number, reqType: ReqType) {
   }
 }
 
-const getUser = (docId: string, reqType: ReqType) =>
-  reqType === ReqType.graphql ?
-    gqlGetUser(docId) :
-    rpcGetUser(docId);
+async function getUser(docId: string, reqType: ReqType) {
+  const user = reqType === ReqType.graphql ?
+    await gqlGetUser(docId) :
+    await rpcGetUser(docId);
+  console.log('Got', user?.fields.name);
+  return user;
+}
 
 async function getNUsers(limit: number, reqType: ReqType) {
   const result = reqType === ReqType.graphql ?
@@ -65,7 +71,8 @@ async function getNUsers(limit: number, reqType: ReqType) {
   const users: User[] = [];
   for (const doc of result.documents) {
     const user = await getUser(doc.meta.documentId, reqType);
-    users.push(user as User);
+    invariant(user, 'User not found!');
+    users.push(user.fields as User);
   }
 
   return users;
@@ -86,16 +93,19 @@ async function runBenchmark() {
       const count = Number(arg);
       invariant(count, 'invalid count');
       await createUserList(count, ReqType[reqType]);
+      break;
     }
     case 'get-one': {
       const limit = Number(arg);
       invariant(limit, 'invalid limit');
       await getNUsers(limit, ReqType[reqType]);
+      break;
     }
     case 'get-many': {
       const limit = Number(arg);
       invariant(limit, 'invalid limit');
       await getUsers(limit);
+      break;
     }
   }
 

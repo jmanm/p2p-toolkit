@@ -6,7 +6,7 @@ import { AQUADOGGO_GQL_ENDPOINT } from '../constants';
 
 const client = new GraphQLClient(AQUADOGGO_GQL_ENDPOINT);
 
-export async function request<T>(query: RequestDocument, variables?: any): Promise<{ [key: string]: T } | undefined> {
+export async function request<T>(query: RequestDocument, variables?: any): Promise<T | undefined> {
   try {
     return await client.request(query, variables);
   } catch (error) {
@@ -26,7 +26,7 @@ async function nextArgs(publicKey: string, viewId?: string): Promise<NextArgs | 
     }
   `;
 
-  const result = await request<NextArgs>(query, {
+  const result = await request<{ nextArgs: NextArgs }>(query, {
     publicKey,
     viewId,
   });
@@ -49,7 +49,7 @@ async function publish(
     }
   `;
 
-  const result = await request<NextArgs>(query, {
+  const result = await request<{ publish: NextArgs }>(query, {
     entry,
     operation,
   });
