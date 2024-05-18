@@ -1,23 +1,38 @@
-// Original file: ../p2panda/aquadoggo/aquadoggo/proto/rpc.proto
+// Original file: ../../../p2panda/aquadoggo/aquadoggo/proto/rpc.proto
 
-import type { Pagination as _rpc_Pagination, Pagination__Output as _rpc_Pagination__Output } from '../rpc/Pagination';
-import type { Order as _rpc_Order, Order__Output as _rpc_Order__Output } from '../rpc/Order';
-import type { FilterSetting as _rpc_FilterSetting, FilterSetting__Output as _rpc_FilterSetting__Output } from '../rpc/FilterSetting';
+import type { FilterCondition as _rpc_FilterCondition, FilterCondition__Output as _rpc_FilterCondition__Output } from '../rpc/FilterCondition';
+import type { MetaFilter as _rpc_MetaFilter, MetaFilter__Output as _rpc_MetaFilter__Output } from '../rpc/MetaFilter';
+import type { Direction as _rpc_Direction, Direction__Output as _rpc_Direction__Output } from '../rpc/Direction';
+import type { Long } from '@grpc/proto-loader';
 
 export interface CollectionRequest {
   'schemaId'?: (string);
-  'pagination'?: (_rpc_Pagination | null);
-  'order'?: (_rpc_Order | null);
-  'filter'?: (_rpc_FilterSetting)[];
-  '_pagination'?: "pagination";
-  '_order'?: "order";
+  'filter'?: ({[key: string]: _rpc_FilterCondition});
+  'meta'?: (_rpc_MetaFilter | null);
+  'orderBy'?: (string);
+  'orderDirection'?: (_rpc_Direction);
+  'first'?: (number | string | Long);
+  'after'?: (string);
+  'selections'?: ({[key: string]: boolean});
+  '_meta'?: "meta";
+  '_orderBy'?: "orderBy";
+  '_orderDirection'?: "orderDirection";
+  '_first'?: "first";
+  '_after'?: "after";
 }
 
 export interface CollectionRequest__Output {
   'schemaId': (string);
-  'pagination'?: (_rpc_Pagination__Output | null);
-  'order'?: (_rpc_Order__Output | null);
-  'filter': (_rpc_FilterSetting__Output)[];
-  '_pagination': "pagination";
-  '_order': "order";
+  'filter': ({[key: string]: _rpc_FilterCondition__Output});
+  'meta'?: (_rpc_MetaFilter__Output | null);
+  'orderBy'?: (string);
+  'orderDirection'?: (_rpc_Direction__Output);
+  'first'?: (string);
+  'after'?: (string);
+  'selections': ({[key: string]: boolean});
+  '_meta': "meta";
+  '_orderBy': "orderBy";
+  '_orderDirection': "orderDirection";
+  '_first': "first";
+  '_after': "after";
 }

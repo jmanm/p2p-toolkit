@@ -1,4 +1,4 @@
-// Original file: ../p2panda/aquadoggo/aquadoggo/proto/rpc.proto
+// Original file: ../../../p2panda/aquadoggo/aquadoggo/proto/rpc.proto
 
 export const Direction = {
   Ascending: 'Ascending',

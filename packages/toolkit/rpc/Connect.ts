@@ -1,4 +1,4 @@
-// Original file: ../p2panda/aquadoggo/aquadoggo/proto/rpc.proto
+// Original file: ../../../p2panda/aquadoggo/aquadoggo/proto/rpc.proto
 
 import type * as grpc from '@grpc/grpc-js'
 import type { MethodDefinition } from '@grpc/proto-loader'

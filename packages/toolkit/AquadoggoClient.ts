@@ -57,13 +57,13 @@ export class AquadoggoClient {
     })
   }
 
-  async getCollection({ schemaId, pagination, order, filter }: CollectionRequest): Promise<CollectionResponse> {
+  async getCollection({ schemaId, filter, first, after, orderBy, orderDirection, selections }: CollectionRequest): Promise<CollectionResponse> {
     if (!schemaId || schemaId.length < HASH_LEN) {
       throw new Error('Missing or malformed schema ID');
     }
 
     return new Promise((resolve, reject) => {
-      this.grpcClient.getCollection({ schemaId, pagination, order, filter },
+      this.grpcClient.getCollection({ schemaId, filter, first, after, orderBy, orderDirection, selections },
         (err, coll) => {
           err && reject(err);
           coll && resolve(coll);
@@ -72,7 +72,7 @@ export class AquadoggoClient {
     });
   }
 
-  async getDocument({ documentId, documentViewId }: DocumentRequest): Promise<DocumentResponse> {
+  async getDocument({ documentId, documentViewId, selections }: DocumentRequest): Promise<DocumentResponse> {
     if ((!documentId || documentId.length < HASH_LEN) &&
         (!documentViewId || documentViewId.length < HASH_LEN)
     ) {
@@ -80,7 +80,7 @@ export class AquadoggoClient {
     }
 
     return new Promise((resolve, reject) => {
-      this.grpcClient.getDocument({ documentId, documentViewId },
+      this.grpcClient.getDocument({ documentId, documentViewId, selections },
         (err, doc) => {
           err && reject(err);
           doc && resolve(doc);

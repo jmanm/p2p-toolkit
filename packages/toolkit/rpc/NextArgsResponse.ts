@@ -1,4 +1,4 @@
-// Original file: ../p2panda/aquadoggo/aquadoggo/proto/rpc.proto
+// Original file: ../../../p2panda/aquadoggo/aquadoggo/proto/rpc.proto
 
 import type { Long } from '@grpc/proto-loader';
 

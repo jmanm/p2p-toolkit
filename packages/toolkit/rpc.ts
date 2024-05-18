@@ -14,23 +14,16 @@ export interface ProtoGrpcType {
     Connect: SubtypeConstructor<typeof grpc.Client, _rpc_ConnectClient> & { service: _rpc_ConnectDefinition }
     Direction: EnumTypeDefinition
     Document: MessageTypeDefinition
-    DocumentCursorTuple: MessageTypeDefinition
     DocumentList: MessageTypeDefinition
     DocumentMeta: MessageTypeDefinition
     DocumentRequest: MessageTypeDefinition
     DocumentResponse: MessageTypeDefinition
     Field: MessageTypeDefinition
-    FieldType: EnumTypeDefinition
+    FilterCondition: MessageTypeDefinition
     FilterOperator: EnumTypeDefinition
-    FilterSetting: MessageTypeDefinition
-    MetaField: EnumTypeDefinition
+    MetaFilter: MessageTypeDefinition
     NextArgsRequest: MessageTypeDefinition
     NextArgsResponse: MessageTypeDefinition
-    Order: MessageTypeDefinition
-    Pagination: MessageTypeDefinition
-    PaginationCursor: MessageTypeDefinition
-    PaginationData: MessageTypeDefinition
-    PaginationField: EnumTypeDefinition
     PublishRequest: MessageTypeDefinition
   }
 }

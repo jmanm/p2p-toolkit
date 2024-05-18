@@ -4,7 +4,7 @@
   "module": "index.ts",
   "type": "module",
   "scripts": {
-    "rpc:generate": "proto-loader-gen-types --longs=String --enums=String --defaults --oneofs --grpcLib=@grpc/grpc-js --outDir=./ ../p2panda/aquadoggo/aquadoggo/proto/rpc.proto"
+    "rpc:generate": "proto-loader-gen-types --longs=String --enums=String --defaults --oneofs --grpcLib=@grpc/grpc-js --outDir=./ ../../../p2panda/aquadoggo/aquadoggo/proto/rpc.proto"
   },
   "devDependencies": {
     "@types/bun": "latest"
