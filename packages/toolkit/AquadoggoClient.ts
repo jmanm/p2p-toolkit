@@ -3,11 +3,12 @@ import { load as loadProto } from '@grpc/proto-loader';
 import type { ProtoGrpcType } from "./rpc";
 import type { ConnectClient } from "./rpc/Connect";
 import type { DocumentRequest } from "./rpc/DocumentRequest";
-import type { CollectionRequest } from "./rpc/CollectionRequest";
+import type { CollectionRequest as RpcCollectionRequest } from "./rpc/CollectionRequest";
 import { KeyPair, OperationFields, encodeOperation, signAndEncodeEntry, type EasyValues } from "p2panda-js";
 import type { NextArgsResponse } from "./rpc/NextArgsResponse";
 import type { CollectionResponse } from "./rpc/CollectionResponse";
 import type { DocumentResponse } from "./rpc/DocumentResponse";
+import { toRpcCollectionRequest, type CollectionRequest } from "./queries";
 
 const HASH_LEN = 68;
 
@@ -57,13 +58,14 @@ export class AquadoggoClient {
     })
   }
 
-  async getCollection({ schemaId, filter, first, after, orderBy, orderDirection, selections }: CollectionRequest): Promise<CollectionResponse> {
-    if (!schemaId || schemaId.length < HASH_LEN) {
+  async getCollection<T>(request: CollectionRequest<T>): Promise<CollectionResponse> {
+    if (!request.schemaId || request.schemaId.length < HASH_LEN) {
       throw new Error('Missing or malformed schema ID');
     }
 
+    const rpcRequest = toRpcCollectionRequest<T>(request);
     return new Promise((resolve, reject) => {
-      this.grpcClient.getCollection({ schemaId, filter, first, after, orderBy, orderDirection, selections },
+      this.grpcClient.getCollection(rpcRequest,
         (err, coll) => {
           err && reject(err);
           coll && resolve(coll);
