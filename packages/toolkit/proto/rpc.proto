@@ -1,0 +1,127 @@
+syntax = "proto3";
+
+package rpc;
+
+service Connect {
+  rpc GetCollection(CollectionRequest) returns (CollectionResponse) {}
+  rpc GetDocument(DocumentRequest) returns (DocumentResponse) {}
+  rpc GetNextArgs(NextArgsRequest) returns (NextArgsResponse) {}
+  rpc DoPublish(PublishRequest) returns (NextArgsResponse) {}
+}
+
+message CollectionRequest {
+  string schema_id = 1;
+  map<string, FilterCondition> filter = 2;
+  optional MetaFilter meta = 3;
+  optional string orderBy = 4;
+  optional Direction orderDirection = 5;
+  optional uint64 first = 6;
+  optional string after = 7;
+  map<string, bool> selections = 8;
+}
+
+enum Direction {
+  Ascending = 0;
+  Descending = 1;
+}
+
+message MetaFilter {
+  optional string documentId = 1;
+  optional string viewId = 2;
+  optional string owner = 3;
+  optional bool edited = 4;
+  optional bool deleted = 5;
+}
+
+message FilterCondition {
+  FilterOperator operator = 1;
+  oneof value {
+    Document rel_val = 2;
+    DocumentList rel_list_val = 3;
+    Document pinned_rel_val = 4;
+    DocumentList pinned_rel_list_val = 5;
+    string string_val = 6;
+    sint64 int_val = 7;
+    double float_val = 8;
+    bool bool_val = 9;
+    bytes byte_val = 10;
+  }
+}
+
+enum FilterOperator {
+  In = 0;
+  NotIn = 1;
+  Eq = 2;
+  NotEq = 3;
+  Gt = 4;
+  Gte = 5;
+  Lt = 6;
+  Lte = 7;
+  Contains = 8;
+  NotContains = 9;
+}
+
+message CollectionResponse {
+  uint64 total_count = 1;
+  bool has_next_page = 2;
+  string end_cursor = 3;
+  repeated Document documents = 4;
+}
+
+message DocumentRequest {
+  optional string document_id = 1;
+  optional string document_view_id = 2;
+  map<string, bool> selections = 3;
+}
+
+message DocumentResponse {
+  optional Document document = 1;
+}
+
+message DocumentMeta {
+  string document_id = 1;
+  string view_id = 2;
+  string owner = 3;
+}
+
+message Document {
+  DocumentMeta meta = 1;
+  optional string cursor = 2;
+  repeated Field fields = 3;
+}
+
+message Field {
+  string name = 1;
+  oneof value {
+    Document rel_val = 2;
+    DocumentList rel_list_val = 3;
+    Document pinned_rel_val = 4;
+    DocumentList pinned_rel_list_val = 5;
+    string string_val = 6;
+    sint64 int_val = 7;
+    double float_val = 8;
+    bool bool_val = 9;
+    bytes byte_val = 10;
+  }
+}
+
+message DocumentList {
+  repeated Document documents = 1;
+}
+
+message NextArgsRequest {
+  string public_key = 1;
+  optional string document_view_id = 2;
+}
+
+message PublishRequest {
+  string entry = 1;
+  string operation = 2;
+}
+
+message NextArgsResponse {
+  uint64 log_id = 1;
+  uint64 seq_num = 2;
+  optional string backlink = 3;
+  optional string skiplink = 4;
+}

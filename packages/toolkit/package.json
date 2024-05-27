@@ -6,7 +6,8 @@
   "scripts": {
     "rpc:clean": "rm -r rpc/ && rm rpc.ts",
     "rpc:import": "proto-loader-gen-types --longs=String --enums=String --defaults --oneofs --grpcLib=@grpc/grpc-js --outDir=./ ../../../p2panda/aquadoggo/aquadoggo/proto/rpc.proto",
-    "rpc:generate": "bun rpc:clean && bun rpc:import"
+    "rpc:generate": "bun rpc:clean && bun rpc:import",
+    "postinstall": "cp ./packages/proto/rpc.proto ./proto/rpc.proto"
   },
   "devDependencies": {
     "@types/bun": "latest"
