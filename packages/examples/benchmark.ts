@@ -115,9 +115,3 @@ async function runBenchmark() {
 }
 
 await runBenchmark();
-
-/*
-  Benchmark 1: bun run bench:create grpc 10
-  Time (mean ± σ):     288.0 ms ±  14.6 ms    [User: 350.1 ms, System: 54.5 ms]
-  Range (min … max):   276.5 ms … 325.3 ms    10 runs
-*/

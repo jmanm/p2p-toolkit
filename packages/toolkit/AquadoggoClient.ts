@@ -14,7 +14,7 @@ const HASH_LEN = 68;
 
 export interface ClientOptions {
   serverUrl: string;
-  protoFilePath: string;
+  protoFilePath?: string;
   credentials: ChannelCredentials;
 }
 
@@ -22,7 +22,7 @@ export class AquadoggoClient {
   protected constructor(private grpcClient: ConnectClient) { }
 
   static async load(options: ClientOptions) {
-    const def = await loadProto(options.protoFilePath);
+    const def = await loadProto(options.protoFilePath ?? './proto/rpc.proto');
     const { rpc } = loadPackageDefinition(def) as unknown as ProtoGrpcType;
     const client = new rpc.Connect(options.serverUrl, options.credentials);
     return new AquadoggoClient(client);
