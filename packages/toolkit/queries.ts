@@ -67,10 +67,13 @@ export interface CollectionRequest<T> {
 function toRpcOperator(operator: Op): RpcFilterOperator {
   switch (operator) {
     case 'contains': return 'Contains';
+    case 'notContains': return 'NotContains';
     case 'eq': return 'Eq';
+    case 'notEq': return 'NotEq';
     case 'gt': return 'Gt';
     case 'gte': return 'Gte';
     case 'in': return 'In';
+    case 'notIn': return 'NotIn';
     case 'lt': return 'Lt';
     case 'lte': return 'Lte';
   }
