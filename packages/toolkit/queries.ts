@@ -9,7 +9,7 @@ import type { MetaFilter } from "./rpc/MetaFilter";
 type Op = Uncapitalize<Exclude<RpcFilterOperator, 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9>>;
 
 type FilterValue = {
-  [op in Op]?: string | number | boolean | null
+  [op in Op]?: string | number | boolean | object | null
 };
 
 export type Filter<T> = {
