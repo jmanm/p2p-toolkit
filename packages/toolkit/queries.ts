@@ -83,13 +83,13 @@ function toRpcOperator(operator: Op): RpcFilterOperator {
 function toRpcFilterCondition(operator: string, value: any): RpcFilterCondition {
   const op = toRpcOperator(operator as Op);
   switch (typeof value) {
-    case 'number': return Number.isInteger(value) ? { [op]: { intVal: value } } : { [op]: { floatVal: value }};
-    case 'bigint': return { [op]: { floatVal: value } }; // TODO - handle bigints
-    case 'string': return { [op]: { stringVal: value } };
-    case 'boolean': return { [op]: { boolVal: value } };
-    case 'object': return { [op]: { relVal: value } };
+    case 'number': return Number.isInteger(value) ? { operator: op, intVal: value } : { operator: op, floatVal: value };
+    // case 'bigint': return { operator: op, floatVal: value }; // TODO - handle bigints
+    case 'string': return { operator: op, stringVal: value };
+    case 'boolean': return { operator: op, boolVal: value };
+    case 'object': return { operator: op, relVal: value };
   }
-  return { [op]: { stringVal: null } };
+  return { operator: op, stringVal: undefined };
 }
 
 function toRpcFilter<T>(filter?: Filter<T>): { [key: string]: RpcFilterCondition } | undefined {
