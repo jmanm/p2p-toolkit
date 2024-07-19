@@ -1,9 +1,11 @@
 import type { CollectionRequest as RpcCollectionRequest } from "./rpc/CollectionRequest";
+import type { CollectionResponse as RpcCollectionResponse } from "./rpc/CollectionResponse";
 import { Direction as RpcDirection } from "./rpc/Direction";
-import type { Document } from "./rpc/Document";
+import type { Document as RpcDocument } from "./rpc/Document";
+import type { DocumentMeta } from "./rpc/DocumentMeta";
 import type { Field } from "./rpc/Field";
 import type { FilterCondition as RpcFilterCondition } from "./rpc/FilterCondition";
-import { FilterOperator, FilterOperator as RpcFilterOperator } from "./rpc/FilterOperator";
+import { FilterOperator as RpcFilterOperator } from "./rpc/FilterOperator";
 import type { MetaFilter } from "./rpc/MetaFilter";
 
 type Op = Uncapitalize<Exclude<RpcFilterOperator, 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9>>;
@@ -36,8 +38,8 @@ function getFieldVal(field: Field) {
   return field.stringVal ?? field.intVal ?? field.floatVal ?? field.byteVal ?? field.boolVal;
 }
 
-export function buildObject(document?: Document) {
-  if (!document || !document?.fields) {
+export function buildObject<T>(document?: RpcDocument | null): Document<T> | undefined {
+  if (!document || !document?.fields || !document?.meta) {
     return undefined;
   }
   const fieldEntries: any = (document.fields ?? []).map(f => [
@@ -46,12 +48,36 @@ export function buildObject(document?: Document) {
   ]);
   return {
     meta: document.meta,
-    fields: Object.fromEntries(fieldEntries)
+    cursor: document.cursor,
+    fields: Object.fromEntries(fieldEntries) as T
   };
+}
+
+export function buildCollection<T>(collection: RpcCollectionResponse): CollectionResponse<T> {
+  const { totalCount = 0, hasNextPage = false, endCursor, documents = [] } = collection;
+  return {
+    totalCount,
+    hasNextPage,
+    endCursor,
+    documents: documents.map(doc => buildObject<T>(doc)).filter(d => d != null)
+  }
 }
 
 type Dir = Exclude<RpcDirection, 0 | 1>;
 export type SortDirection = Uncapitalize<Dir>;
+
+export interface Document<T> {
+  meta: DocumentMeta;
+  cursor?: string;
+  fields: Partial<T>;
+}
+
+// TODO - map these types from Rpc types instead of redefining them
+export interface DocumentRequest<T> {
+  documentId?: string;
+  documentViewId?: string;
+  selections?: FieldSelection<T>;
+}
 
 export interface CollectionRequest<T> {
   schemaId?: string;
@@ -62,6 +88,13 @@ export interface CollectionRequest<T> {
   first?: number;
   after?: string;
   selections?: FieldSelection<T>;
+}
+
+export interface CollectionResponse<T> {
+  totalCount: number;
+  hasNextPage: boolean;
+  endCursor?: string;
+  documents: Document<T>[];
 }
 
 function toRpcOperator(operator: Op): RpcFilterOperator {

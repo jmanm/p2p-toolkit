@@ -2,13 +2,9 @@ import { loadPackageDefinition, ChannelCredentials } from "@grpc/grpc-js";
 import { load as loadProto } from '@grpc/proto-loader';
 import type { ProtoGrpcType } from "./rpc";
 import type { ConnectClient } from "./rpc/Connect";
-import type { DocumentRequest } from "./rpc/DocumentRequest";
-import type { CollectionRequest as RpcCollectionRequest } from "./rpc/CollectionRequest";
 import { KeyPair, OperationFields, encodeOperation, signAndEncodeEntry, type EasyValues } from "p2panda-js";
 import type { NextArgsResponse } from "./rpc/NextArgsResponse";
-import type { CollectionResponse } from "./rpc/CollectionResponse";
-import type { DocumentResponse } from "./rpc/DocumentResponse";
-import { toRpcCollectionRequest, type CollectionRequest } from "./queries";
+import { buildCollection, buildObject, toRpcCollectionRequest, type CollectionRequest, type CollectionResponse, type Document, type DocumentRequest } from "./queries";
 
 const HASH_LEN = 68;
 
@@ -58,7 +54,7 @@ export class AquadoggoClient {
     })
   }
 
-  async getCollection<T>(request: CollectionRequest<T>): Promise<CollectionResponse> {
+  async getCollection<T>(request: CollectionRequest<T>): Promise<CollectionResponse<T>> {
     if (!request.schemaId || request.schemaId.length < HASH_LEN) {
       throw new Error('Missing or malformed schema ID');
     }
@@ -68,13 +64,13 @@ export class AquadoggoClient {
       this.grpcClient.getCollection(rpcRequest,
         (err, coll) => {
           err && reject(err);
-          coll && resolve(coll);
+          coll && resolve(buildCollection<T>(coll));
         }
       )
     });
   }
 
-  async getDocument({ documentId, documentViewId, selections }: DocumentRequest): Promise<DocumentResponse> {
+  async getDocument<T>({ documentId, documentViewId, selections }: DocumentRequest<T>): Promise<Document<T> | undefined> {
     if ((!documentId || documentId.length < HASH_LEN) &&
         (!documentViewId || documentViewId.length < HASH_LEN)
     ) {
@@ -85,7 +81,7 @@ export class AquadoggoClient {
       this.grpcClient.getDocument({ documentId, documentViewId, selections },
         (err, doc) => {
           err && reject(err);
-          doc && resolve(doc);
+          doc && resolve(buildObject<T>(doc?.document));
         }
       );
     });
