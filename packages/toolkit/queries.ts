@@ -27,7 +27,7 @@ function getFieldVal(field: Field) {
     return buildObject(field.pinnedRelVal);
   }
   if (field.relVal) {
-    buildObject(field.relVal);
+    return buildObject(field.relVal);
   }
   if (field.pinnedRelListVal) {
     return field.pinnedRelListVal.documents?.map(d => buildObject(d));
@@ -56,7 +56,7 @@ export function buildObject<T>(document?: RpcDocument | null): Document<T> | und
 export function buildCollection<T>(collection: RpcCollectionResponse): CollectionResponse<T> {
   const { totalCount = 0, hasNextPage = false, endCursor, documents = [] } = collection;
   return {
-    totalCount,
+    totalCount: Number(totalCount),
     hasNextPage,
     endCursor,
     documents: documents.map(doc => buildObject<T>(doc)).filter(d => d != null)

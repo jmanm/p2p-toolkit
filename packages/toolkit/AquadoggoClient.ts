@@ -14,6 +14,8 @@ export interface ClientOptions {
   credentials: ChannelCredentials;
 }
 
+export type PublishValue = OperationFields | EasyValues;
+
 export class AquadoggoClient {
   protected constructor(private grpcClient: ConnectClient) { }
 
@@ -29,7 +31,7 @@ export class AquadoggoClient {
   }
 
   async doPublish({ model, keyPair, schemaId }: {
-    model: EasyValues | OperationFields,
+    model: PublishValue,
     keyPair: KeyPair,
     schemaId: string
   }): Promise<NextArgsResponse> {
