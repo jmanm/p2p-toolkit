@@ -1,8 +1,7 @@
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { AquadoggoClient, type PublishValue } from "./AquadoggoClient";
 import type { DocumentMeta } from "./rpc/DocumentMeta";
-import type { DocumentRequest } from "./rpc/DocumentRequest";
-import type { Document, Filter, FieldSelection, CollectionRequest, CollectionResponse } from "./queries";
+import type { Document, DocumentRequest, Filter, FieldSelection, CollectionRequest, CollectionResponse } from "./queries";
 import { KeyPair, OperationFields, verifySignature } from "p2panda-js";
 
 export {

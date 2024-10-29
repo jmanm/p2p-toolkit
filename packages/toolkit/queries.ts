@@ -49,7 +49,7 @@ export function buildObject<T>(document?: RpcDocument | null): Document<T> | und
   return {
     meta: document.meta,
     cursor: document.cursor,
-    fields: Object.fromEntries(fieldEntries) as T
+    fields: Object.fromEntries(fieldEntries) as DocumentFields<T>
   };
 }
 
@@ -65,11 +65,13 @@ export function buildCollection<T>(collection: RpcCollectionResponse): Collectio
 
 type Dir = Exclude<RpcDirection, 0 | 1>;
 export type SortDirection = Uncapitalize<Dir>;
+type ObjectType<T extends object> = T extends Date ? never : T;
+type DocumentFields<T> = { [Prop in keyof T]: T[Prop] extends Date ? T[Prop] : T[Prop] extends object ? Document<T[Prop]> : T[Prop] };
 
 export interface Document<T> {
   meta: DocumentMeta;
   cursor?: string;
-  fields: Partial<T>;
+  fields: Partial<DocumentFields<T>>;
 }
 
 // TODO - map these types from Rpc types instead of redefining them
