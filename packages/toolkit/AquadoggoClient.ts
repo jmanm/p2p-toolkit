@@ -2,7 +2,7 @@ import { loadPackageDefinition, ChannelCredentials } from "@grpc/grpc-js";
 import { load as loadProto } from '@grpc/proto-loader';
 import type { ProtoGrpcType } from "./rpc";
 import type { ConnectClient } from "./rpc/Connect";
-import { KeyPair, OperationFields, encodeOperation, signAndEncodeEntry, type EasyValues } from "p2panda-js";
+import { KeyPair, OperationFields, encodeOperation, signAndEncodeEntry, type EasyValues, type EntryArgs } from "p2panda-js";
 import type { NextArgsResponse } from "./rpc/NextArgsResponse";
 import { buildCollection, buildObject, toRpcCollectionRequest, type CollectionRequest, type CollectionResponse, type Document, type DocumentRequest } from "./queries";
 
@@ -13,8 +13,6 @@ export interface ClientOptions {
   protoFilePath?: string;
   credentials: ChannelCredentials;
 }
-
-export type PublishValue = OperationFields | EasyValues;
 
 export class AquadoggoClient {
   protected constructor(private grpcClient: ConnectClient) { }
@@ -31,7 +29,7 @@ export class AquadoggoClient {
   }
 
   async doPublish({ model, keyPair, schemaId }: {
-    model: PublishValue,
+    model: OperationFields | EasyValues,
     keyPair: KeyPair,
     schemaId: string
   }): Promise<NextArgsResponse> {
@@ -41,10 +39,11 @@ export class AquadoggoClient {
       schemaId,
       fields: model,
     });
-    const entry = signAndEncodeEntry({
+    const entryArgs = {
       ..._nextArgs,
       operation,
-    }, keyPair);
+    } as EntryArgs;
+    const entry = signAndEncodeEntry(entryArgs, keyPair);
 
     return new Promise((resolve, reject) => {
       this.grpcClient.doPublish({ entry, operation },
