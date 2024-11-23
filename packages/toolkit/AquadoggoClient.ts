@@ -28,28 +28,31 @@ export class AquadoggoClient {
     this.grpcClient.close();
   }
 
-  async doPublish({ model, keyPair, schemaId }: {
+  async doPublish({ model, keyPair, schemaId, nextArgs }: {
     model: OperationFields | EasyValues,
     keyPair: KeyPair,
-    schemaId: string
+    schemaId: string,
+    nextArgs?: NextArgsResponse
   }): Promise<NextArgsResponse> {
-    const _nextArgs = await this.nextArgs(keyPair.publicKey());
-
+    if (!nextArgs) {
+      nextArgs = await this.nextArgs(keyPair.publicKey());
+    }
+    
     const operation = encodeOperation({
       schemaId,
       fields: model,
     });
     const entryArgs = {
-      ..._nextArgs,
+      ...nextArgs,
       operation,
     } as EntryArgs;
     const entry = signAndEncodeEntry(entryArgs, keyPair);
 
     return new Promise((resolve, reject) => {
       this.grpcClient.doPublish({ entry, operation },
-        (err, nextArgs) => {
+        (err, newNextArgs) => {
           err && reject(err);
-          nextArgs && resolve(nextArgs);
+          newNextArgs && resolve(newNextArgs);
         }
       );
     })

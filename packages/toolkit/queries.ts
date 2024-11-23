@@ -1,4 +1,3 @@
-import type { EasyValues } from "p2panda-js";
 import type { CollectionRequest as RpcCollectionRequest } from "./rpc/CollectionRequest";
 import type { CollectionResponse as RpcCollectionResponse } from "./rpc/CollectionResponse";
 import { Direction as RpcDirection } from "./rpc/Direction";
@@ -65,9 +64,28 @@ export function buildCollection<T>(collection: RpcCollectionResponse): Collectio
 }
 
 type Dir = Exclude<RpcDirection, 0 | 1>;
+
 export type SortDirection = Uncapitalize<Dir>;
-type DocumentFields<T> = { [Prop in keyof T]: T[Prop] extends Date ? T[Prop] : T[Prop] extends object ? Document<T[Prop]> : T[Prop] };
-export type PublishValue<T> = { [Prop in keyof T]: T[Prop] extends Date ? T[Prop] : T[Prop] extends object ? string : T[Prop] };
+
+type DocumentFields<T> = {
+  [Prop in keyof T]: T[Prop] extends Date ?
+    T[Prop] :
+    T[Prop] extends Array<infer TC> ?
+      Array<Document<TC>> :
+      T[Prop] extends object ?
+        Document<T[Prop]> :
+        T[Prop]
+};
+
+export type PublishValue<T> = {
+  [Prop in keyof T]: T[Prop] extends Date ?
+    T[Prop] :
+    T[Prop] extends Array<infer TC> ?
+      Array<PublishValue<TC>> :
+      T[Prop] extends object ?
+        string :
+        T[Prop]
+};
 
 export interface Document<T> {
   meta: DocumentMeta;
@@ -112,8 +130,8 @@ function toRpcOperator(operator: Op): RpcFilterOperator {
     case 'notIn': return 'NotIn';
     case 'lt': return 'Lt';
     case 'lte': return 'Lte';
+    default: return 'Eq';
   }
-  return 'Eq';
 }
 
 function toRpcFilterCondition(operator: string, value: any): RpcFilterCondition {
