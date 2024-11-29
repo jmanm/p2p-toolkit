@@ -28,19 +28,28 @@ export class AquadoggoClient {
     this.grpcClient.close();
   }
 
-  async doPublish({ model, keyPair, schemaId, nextArgs }: {
-    model: OperationFields | EasyValues,
+  async doPublish({ model, keyPair, schemaId, nextArgs, action, documentViewId }: {
+    model?: OperationFields | EasyValues,
     keyPair: KeyPair,
     schemaId: string,
-    nextArgs?: NextArgsResponse
+    documentViewId?: string,
+    nextArgs?: NextArgsResponse,
+    action?: 'create' | 'delete' | 'update'
   }): Promise<NextArgsResponse> {
     if (!nextArgs) {
-      nextArgs = await this.nextArgs(keyPair.publicKey());
+      nextArgs = await this.nextArgs(keyPair.publicKey(), documentViewId);
     }
-    
+    action ??= 'create';
+
+    if (action !== 'delete' && !model) {
+      throw new Error('Model is required for create and update actions');
+    }
+
     const operation = encodeOperation({
       schemaId,
+      previous: documentViewId,
       fields: model,
+      action
     });
     const entryArgs = {
       ...nextArgs,
@@ -55,7 +64,7 @@ export class AquadoggoClient {
           newNextArgs && resolve(newNextArgs);
         }
       );
-    })
+    });
   }
 
   async getCollection<T>(request: CollectionRequest<T>): Promise<CollectionResponse<T>> {
@@ -70,13 +79,13 @@ export class AquadoggoClient {
           err && reject(err);
           coll && resolve(buildCollection<T>(coll));
         }
-      )
+      );
     });
   }
 
   async getDocument<T>({ documentId, documentViewId, selections }: DocumentRequest<T>): Promise<Document<T> | undefined> {
     if ((!documentId || documentId.length < HASH_LEN) &&
-        (!documentViewId || documentViewId.length < HASH_LEN)
+      (!documentViewId || documentViewId.length < HASH_LEN)
     ) {
       throw new Error('Missing or malformed document ID and/or document view ID');
     }
@@ -91,13 +100,13 @@ export class AquadoggoClient {
     });
   }
 
-  async nextArgs(publicKey: string): Promise<NextArgsResponse> {
+  async nextArgs(publicKey: string, documentViewId?: string): Promise<NextArgsResponse> {
     if (!publicKey) {
       throw new Error('No public key provided');
     }
 
     return new Promise((resolve, reject) => {
-      this.grpcClient.getNextArgs({ publicKey },
+      this.grpcClient.getNextArgs({ publicKey, documentViewId },
         (err, args) => {
           err && reject(err);
           args && resolve(args);
