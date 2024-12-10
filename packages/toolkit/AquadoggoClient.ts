@@ -28,7 +28,7 @@ export class AquadoggoClient {
     this.grpcClient.close();
   }
 
-  async doPublish({ model, keyPair, schemaId, nextArgs, action, documentViewId }: {
+  async publish({ model, keyPair, schemaId, nextArgs, action, documentViewId }: {
     model?: OperationFields | EasyValues,
     keyPair: KeyPair,
     schemaId: string,
@@ -58,7 +58,7 @@ export class AquadoggoClient {
     const entry = signAndEncodeEntry(entryArgs, keyPair);
 
     return new Promise((resolve, reject) => {
-      this.grpcClient.doPublish({ entry, operation },
+      this.grpcClient.publish({ entry, operation },
         (err, newNextArgs) => {
           err && reject(err);
           newNextArgs && resolve(newNextArgs);
