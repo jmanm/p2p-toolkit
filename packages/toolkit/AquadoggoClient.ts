@@ -6,31 +6,38 @@ import { KeyPair, OperationFields, encodeOperation, signAndEncodeEntry, type Eas
 import type { NextArgsResponse } from "./rpc/NextArgsResponse";
 import { buildCollection, buildObject, toRpcCollectionRequest, type CollectionRequest, type CollectionResponse, type Document, type DocumentRequest } from "./queries";
 import type { CallMetadataGenerator } from "@grpc/grpc-js/build/src/call-credentials";
+import os from 'os';
 
 const HASH_LEN = 68;
 
 export interface ClientOptions {
+  keyPair: KeyPair,
   serverUrl: string;
   protoFilePath?: string;
   credentials: ChannelCredentials;
 }
 
 export class AquadoggoClient {
+  private rootSignature: string;
+
   private generateToken: CallMetadataGenerator = (options, cb) => {
     const meta = new Metadata();
-    meta.add('authorization', 'a token');
+    meta.add('authorization', this.rootSignature);
     cb(null, meta);
   }
 
   private credentials = CallCredentials.createFromMetadataGenerator(this.generateToken);
 
-  protected constructor(private grpcClient: ConnectClient) { }
+  protected constructor(private rootKeyPair: KeyPair, private grpcClient: ConnectClient) {
+    const machineId = os.networkInterfaces().eth0?.at(0)?.mac ?? os.hostname();
+    this.rootSignature = rootKeyPair.sign(machineId.replaceAll(/[^a-zA-z0-9]+/g, ''));
+  }
 
   static async load(options: ClientOptions) {
-    const def = await loadProto(options.protoFilePath ?? './proto/rpc.proto');
+    const def = await loadProto(options.protoFilePath ?? './proto/connect.proto');
     const { rpc } = loadPackageDefinition(def) as unknown as ProtoGrpcType;
     const client = new rpc.Connect(options.serverUrl, options.credentials);
-    return new AquadoggoClient(client);
+    return new AquadoggoClient(options.keyPair, client);
   }
 
   dispose() {
