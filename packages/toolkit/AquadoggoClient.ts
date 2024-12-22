@@ -1,10 +1,11 @@
-import { loadPackageDefinition, ChannelCredentials } from "@grpc/grpc-js";
+import { loadPackageDefinition, ChannelCredentials, CallCredentials, Metadata } from "@grpc/grpc-js";
 import { load as loadProto } from '@grpc/proto-loader';
 import type { ProtoGrpcType } from "./rpc";
 import type { ConnectClient } from "./rpc/Connect";
 import { KeyPair, OperationFields, encodeOperation, signAndEncodeEntry, type EasyValues, type EntryArgs } from "p2panda-js";
 import type { NextArgsResponse } from "./rpc/NextArgsResponse";
 import { buildCollection, buildObject, toRpcCollectionRequest, type CollectionRequest, type CollectionResponse, type Document, type DocumentRequest } from "./queries";
+import type { CallMetadataGenerator } from "@grpc/grpc-js/build/src/call-credentials";
 
 const HASH_LEN = 68;
 
@@ -15,6 +16,14 @@ export interface ClientOptions {
 }
 
 export class AquadoggoClient {
+  private generateToken: CallMetadataGenerator = (options, cb) => {
+    const meta = new Metadata();
+    meta.add('authorization', 'a token');
+    cb(null, meta);
+  }
+
+  private credentials = CallCredentials.createFromMetadataGenerator(this.generateToken);
+
   protected constructor(private grpcClient: ConnectClient) { }
 
   static async load(options: ClientOptions) {
@@ -58,7 +67,9 @@ export class AquadoggoClient {
     const entry = signAndEncodeEntry(entryArgs, keyPair);
 
     return new Promise((resolve, reject) => {
-      this.grpcClient.publish({ entry, operation },
+      this.grpcClient.publish(
+        { entry, operation },
+        { credentials: this.credentials },
         (err, newNextArgs) => {
           err && reject(err);
           newNextArgs && resolve(newNextArgs);
@@ -75,6 +86,7 @@ export class AquadoggoClient {
     const rpcRequest = toRpcCollectionRequest<T>(request);
     return new Promise((resolve, reject) => {
       this.grpcClient.getCollection(rpcRequest,
+        { credentials: this.credentials },
         (err, coll) => {
           err && reject(err);
           coll && resolve(buildCollection<T>(coll));
@@ -91,7 +103,9 @@ export class AquadoggoClient {
     }
 
     return new Promise((resolve, reject) => {
-      this.grpcClient.getDocument({ documentId, documentViewId, selections },
+      this.grpcClient.getDocument(
+        { documentId, documentViewId, selections },
+        { credentials: this.credentials },
         (err, doc) => {
           err && reject(err);
           doc && resolve(buildObject<T>(doc?.document));
@@ -106,7 +120,9 @@ export class AquadoggoClient {
     }
 
     return new Promise((resolve, reject) => {
-      this.grpcClient.getNextArgs({ publicKey, documentViewId },
+      this.grpcClient.getNextArgs(
+        { publicKey, documentViewId },
+        { credentials: this.credentials },
         (err, args) => {
           err && reject(err);
           args && resolve(args);
