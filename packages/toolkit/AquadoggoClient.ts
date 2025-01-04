@@ -7,6 +7,8 @@ import type { NextArgsResponse } from "./rpc/NextArgsResponse";
 import { buildCollection, buildObject, toRpcCollectionRequest, type CollectionRequest, type CollectionResponse, type Document, type DocumentRequest } from "./queries";
 import type { CallMetadataGenerator } from "@grpc/grpc-js/build/src/call-credentials";
 import os from 'os';
+import { SignJWT } from 'jose';
+import { createPrivateKey, createPublicKey, KeyObject } from "crypto";
 
 const HASH_LEN = 68;
 
@@ -18,20 +20,44 @@ export interface ClientOptions {
 }
 
 export class AquadoggoClient {
-  private rootSignature: string;
-
-  private generateToken: CallMetadataGenerator = (options, cb) => {
-    const meta = new Metadata();
-    meta.add('authorization', this.rootSignature);
-    cb(null, meta);
-  }
-
-  private credentials = CallCredentials.createFromMetadataGenerator(this.generateToken);
+  private jwtPrivateKey: KeyObject;
 
   protected constructor(private rootKeyPair: KeyPair, private grpcClient: ConnectClient) {
-    const machineId = os.networkInterfaces().eth0?.at(0)?.mac ?? os.hostname();
-    this.rootSignature = rootKeyPair.sign(machineId.replaceAll(/[^a-zA-z0-9]+/g, ''));
+    // https://stackoverflow.com/questions/68612396/sign-and-verify-jws-json-web-signature-with-ed25519-keypair?rq=3
+    const pubKeyBuff = Buffer.from(this.rootKeyPair.publicKey(), 'hex');
+    const priKeyBuff = Buffer.from(this.rootKeyPair.privateKey(), 'hex');
+    this.jwtPrivateKey = createPrivateKey({
+      key: {
+        kty: 'OKP',
+        crv: 'Ed25519',
+        x: pubKeyBuff.toString('base64url'),
+        d: priKeyBuff.toString('base64url')
+      },
+      format: 'jwk'
+    });
   }
+
+  private async generateToken() {
+    const payload = {
+      // TODO - find method to fingerprint devices
+      mac: os.networkInterfaces().eth0?.at(0)?.mac,
+      hostname: os.hostname(),
+      timestamp: new Date().getTime()
+    };
+
+    return new SignJWT(payload).setProtectedHeader({ alg: 'EdDSA' }).sign(this.jwtPrivateKey);
+  }
+
+  private getRequestMetadata: CallMetadataGenerator = (options, cb) => {
+    this.generateToken().then(token => {
+      const meta = new Metadata();
+      meta.add('pubKey', this.rootKeyPair.publicKey());
+      meta.add('token', token);
+      cb(null, meta);
+    });
+  }
+
+  private credentials = CallCredentials.createFromMetadataGenerator(this.getRequestMetadata);
 
   static async load(options: ClientOptions) {
     const def = await loadProto(options.protoFilePath ?? './proto/connect.proto');
